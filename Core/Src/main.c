@@ -107,7 +107,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 #define ADC_SAMPLE_SIZE 2 // 16 bits = 2 bytes
-static __attribute__((section(".adc_dma_buf"))) __attribute__((aligned(0x20))) uint16_t adc_buf1[2][ADC_BUF_LEN * 2], adc_buf2[2][ADC_BUF_LEN * 2];
+static __attribute__((section(".adc_dma_buf"))) __attribute__((aligned(0x20))) uint16_t adc_buf1[2][ADC_BUF_LEN * 2];
 uint16_t inboundADCBuf = 0;
 uint16_t cktComputeBufs[8][ADC_BUF_LEN];
 uint32_t segmentSums[NUM_CIRCUITS][NUM_SEGMENTS];
@@ -219,24 +219,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 			inboundADCBuf = 0;
 		}
 
-		// See https://community.st.com/t5/stm32-mcus-products/example-for-adc-in-multimode-with-dual-dma/td-p/259335 for more information on dual ADC DMA
-		SCB_InvalidateDCache_by_Addr((uint32_t *)&adc_buf2[inboundADCBuf], ADC_BUF_LEN * ADC_SAMPLE_SIZE);
-		for (int i = 0; i < ADC_BUF_LEN * 2; i++) {
-			adc_buf2[inboundADCBuf][i] = 0;
-		}
-		if (adc_buf2[inboundADCBuf][4] != 0) {
-			int foo = 123;
-			foo++;
-		}
-
-		SCB_InvalidateDCache_by_Addr((uint32_t *)&adc_buf2[inboundADCBuf], ADC_BUF_LEN * ADC_SAMPLE_SIZE);
-		//SET_BIT(hadc2.Instance->CFGR, 0); //Enable DMA transfer for ADC slave (ADC12_CCR.MDMA = 0b00 -> MDMA mode disabled)
-		//HAL_DMA_Start(hadc2.DMA_Handle, (uint32_t)&hadc2.Instance->DR, (uint32_t)adc_buf2[inboundADCBuf], ADC_BUF_LEN * 2);
 		for (int i = 0; i < ADC_BUF_LEN * 2; i++) {
 			adc_buf1[inboundADCBuf][i] = 0;
 		}
 		SCB_InvalidateDCache_by_Addr((uint32_t *)&adc_buf1[inboundADCBuf], ADC_BUF_LEN * ADC_SAMPLE_SIZE);
-		//SET_BIT(hadc1.Instance->CFGR, 0); //Enable DMA transfer for ADC master (ADC12_CCR.MDMA = 0b00 -> MDMA mode disabled)
 		HAL_ADCEx_MultiModeStart_DMA(&hadc1,(uint32_t *)adc_buf1[inboundADCBuf], ADC_BUF_LEN * 2);
 
 		uint16_t computeADCBuf;
@@ -1424,7 +1410,6 @@ void doHalfCycleCompute(uint16_t computeADCBuf) {
 	}
 
 	SCB_InvalidateDCache_by_Addr((uint32_t *)&adc_buf1[computeADCBuf], ADC_BUF_LEN * ADC_SAMPLE_SIZE * 2);
-	SCB_InvalidateDCache_by_Addr((uint32_t *)&adc_buf2[computeADCBuf], ADC_BUF_LEN * ADC_SAMPLE_SIZE * 2);
 	if (computeADCBuf == 1) {
 		adcCounter++;
 	}
