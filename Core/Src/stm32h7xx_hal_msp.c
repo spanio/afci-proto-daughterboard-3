@@ -106,28 +106,20 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     }
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**ADC1 GPIO Configuration
     PA6     ------> ADC1_INP3
-    PA7     ------> ADC1_INP7
-    PC4     ------> ADC1_INP4
     PB1     ------> ADC1_INP5
     */
-    GPIO_InitStruct.Pin = LOCAL_CKT1_ADC_Pin|LOCAL_CKT2_ADC_Pin;
+    GPIO_InitStruct.Pin = LOCAL_CKT1_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_Init(LOCAL_CKT1_ADC_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_4;
+    GPIO_InitStruct.Pin = LOCAL_CKT3_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_1;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_Init(LOCAL_CKT3_ADC_GPIO_Port, &GPIO_InitStruct);
 
     /* ADC1 DMA Init */
     /* ADC1 Init */
@@ -136,8 +128,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_adc1.Init.Mode = DMA_NORMAL;
     hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
     hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
@@ -166,14 +158,21 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
       __HAL_RCC_ADC12_CLK_ENABLE();
     }
 
+    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     /**ADC2 GPIO Configuration
-    PC5     ------> ADC2_INP8
+    PA7     ------> ADC2_INP7
+    PC4     ------> ADC2_INP4
     */
-    GPIO_InitStruct.Pin = LOCAL_CKT1_ADC_DIRECT_Pin;
+    GPIO_InitStruct.Pin = LOCAL_CKT2_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(LOCAL_CKT1_ADC_DIRECT_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(LOCAL_CKT2_ADC_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = LOCAL_CKT4_ADC_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(LOCAL_CKT4_ADC_GPIO_Port, &GPIO_InitStruct);
 
     /* ADC2 DMA Init */
     /* ADC2 Init */
@@ -182,8 +181,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     hdma_adc2.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_adc2.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_adc2.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_adc2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_adc2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_adc2.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_adc2.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_adc2.Init.Mode = DMA_NORMAL;
     hdma_adc2.Init.Priority = DMA_PRIORITY_LOW;
     hdma_adc2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
@@ -275,15 +274,11 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
     /**ADC1 GPIO Configuration
     PA6     ------> ADC1_INP3
-    PA7     ------> ADC1_INP7
-    PC4     ------> ADC1_INP4
     PB1     ------> ADC1_INP5
     */
-    HAL_GPIO_DeInit(GPIOA, LOCAL_CKT1_ADC_Pin|LOCAL_CKT2_ADC_Pin);
+    HAL_GPIO_DeInit(LOCAL_CKT1_ADC_GPIO_Port, LOCAL_CKT1_ADC_Pin);
 
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_4);
-
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_1);
+    HAL_GPIO_DeInit(LOCAL_CKT3_ADC_GPIO_Port, LOCAL_CKT3_ADC_Pin);
 
     /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(hadc->DMA_Handle);
@@ -313,9 +308,12 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     }
 
     /**ADC2 GPIO Configuration
-    PC5     ------> ADC2_INP8
+    PA7     ------> ADC2_INP7
+    PC4     ------> ADC2_INP4
     */
-    HAL_GPIO_DeInit(LOCAL_CKT1_ADC_DIRECT_GPIO_Port, LOCAL_CKT1_ADC_DIRECT_Pin);
+    HAL_GPIO_DeInit(LOCAL_CKT2_ADC_GPIO_Port, LOCAL_CKT2_ADC_Pin);
+
+    HAL_GPIO_DeInit(LOCAL_CKT4_ADC_GPIO_Port, LOCAL_CKT4_ADC_Pin);
 
     /* ADC2 DMA DeInit */
     HAL_DMA_DeInit(hadc->DMA_Handle);

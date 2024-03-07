@@ -21,7 +21,7 @@
 *****************************************************************************
 ** @attention
 **
-** Copyright (c) 2022 STMicroelectronics.
+** Copyright (c) 2023 STMicroelectronics.
 ** All rights reserved.
 **
 ** This software is licensed under terms that can be found in the LICENSE file
@@ -161,12 +161,7 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM_D1
-  
-    .ram_d2 ORIGIN(RAM_D2) (NOLOAD):
-  {
-    *(.adc_dma_buf)
-  } > RAM_D2  
-  
+
   /* Remove information from the standard libraries */
   /DISCARD/ :
   {
